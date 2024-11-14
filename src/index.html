@@ -5,18 +5,42 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vanilla App Template</title>
-    <link rel="stylesheet" href="./css/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/modern-normalize@2.0.0/modern-normalize.min.css"
+    />
+    <link rel="stylesheet" href="./css/common.css" />
   </head>
   <body>
-    <load src="./partials/header.html" icon-path="img/sprite.svg#logo" />
-
     <main>
-      <!-- Loads the specified .html file -->
-      <load src="./partials/vite-promo.html" />
-      <load src="./partials/badges.html" />
+      <section class="gallery-section">
+        <div class="container">
+          <form class="search-form js-search-form">
+            <input
+              class="search-input js-search-input"
+              type="text"
+              name="user_query"
+              placeholder="Search images..."
+              required
+            />
+            <button class="search-btn" type="submit">Search</button>
+          </form>
+          <span class="loader"></span>
+          <ul class="gallery js-gallery"></ul>
+          <button class="load-more js-load-more is-hidden" type="button">
+            Load more
+          </button>
+          <p class="text">
+            We're sorry, but you've reached the end of search results.
+          </p>
+        </div>
+      </section>
     </main>
-
-    <load src="./partials/footer.html" />
 
     <script type="module" src="./main.js"></script>
   </body>
