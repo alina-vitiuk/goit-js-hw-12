@@ -20,7 +20,7 @@ let currentPage = 1;
 let searchedValue = '';
 let cardHeight = 0;
 let maxPages = 0;
-let perPage = 15;
+let perPage = 100;
 loader.style.display = 'none';
 
 const onSearchFormSubmit = async event => {
@@ -90,9 +90,7 @@ const onLoadMoreBtnClick = async event => {
     if (currentPage === maxPages) {
       loadMoreBtnEl.classList.add('is-hidden');
       lastText.style.display = 'block';
-      console.log('alllllll done');
     } else {
-      console.log('ddadadadwdwdwd');
       const response = await fetchPhotos(searchedValue, currentPage, perPage);
       let galleryCardsTemplate = response.data.hits
         .map(imgDetails => createGalleryCardTemplate(imgDetails))
