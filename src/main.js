@@ -26,6 +26,7 @@ loader.style.display = 'none';
 const onSearchFormSubmit = async event => {
   try {
     event.preventDefault();
+    currentPage = 1;
 
     searchedValue = searchFormEl.elements.user_query.value;
 
@@ -33,24 +34,33 @@ const onSearchFormSubmit = async event => {
 
     const response = await fetchPhotos(searchedValue, currentPage, perPage);
 
+    const isWhiteSpaceString = str => !str.replace(/\s/g, '').length;
+    if (isWhiteSpaceString(searchedValue)) {
+      iziToast.error({
+        message:
+          'Sorry, there are no images matching your search query. Please try again!',
+        position: 'bottomRight',
+      });
+      loader.style.display = 'none';
+      return;
+    }
+
     loader.style.display = 'none';
     maxPages = response.data.totalHits / perPage;
     if (response.data.hits.length === 0) {
+      loadMoreBtnEl.classList.add('is-hidden');
       iziToast.error({
-        title: 'Error',
         message:
           'Sorry, there are no images matching your search query. Please try again!',
         position: 'bottomRight',
       });
     }
-    console.log(response);
 
     let galleryCardsTemplate = response.data.hits
       .map(imgDetails => createGalleryCardTemplate(imgDetails))
       .join('');
 
     galleryEl.innerHTML = galleryCardsTemplate;
-    // searchFormEl.reset();
 
     const refreshPage = new SimpleLightbox('.gallery a', {
       captions: true,
@@ -71,25 +81,39 @@ const onSearchFormSubmit = async event => {
 };
 
 const onLoadMoreBtnClick = async event => {
+  if (onLoadMoreBtnClick.cantClick) return;
+  onLoadMoreBtnClick.cantClick = true;
   try {
     currentPage++;
+    console.log(currentPage);
+    console.log(maxPages);
     if (currentPage === maxPages) {
       loadMoreBtnEl.classList.add('is-hidden');
       lastText.style.display = 'block';
+      console.log('alllllll done');
+    } else {
+      console.log('ddadadadwdwdwd');
+      const response = await fetchPhotos(searchedValue, currentPage, perPage);
+      let galleryCardsTemplate = response.data.hits
+        .map(imgDetails => createGalleryCardTemplate(imgDetails))
+        .join('');
+
+      galleryEl.insertAdjacentHTML('beforeend', galleryCardsTemplate);
+
+      scrollBy({
+        top: cardHeight * 2,
+        behavior: 'smooth',
+      });
+      setTimeout(() => {
+        onLoadMoreBtnClick.cantClick = false;
+      }, 200);
     }
-    const response = await fetchPhotos(searchedValue, currentPage, perPage);
-    let galleryCardsTemplate = response.data.hits
-      .map(imgDetails => createGalleryCardTemplate(imgDetails))
-      .join('');
-
-    galleryEl.insertAdjacentHTML('beforeend', galleryCardsTemplate);
-
-    scrollBy({
-      top: cardHeight * 2,
-      behavior: 'smooth',
-    });
   } catch (err) {
-    console.log(err);
+    iziToast.error({
+      message:
+        'Sorry, there are no images matching your search query. Please try again!',
+      position: 'bottomRight',
+    });
   }
 };
 
