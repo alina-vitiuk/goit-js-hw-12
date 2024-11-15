@@ -20,7 +20,7 @@ let currentPage = 1;
 let searchedValue = '';
 let cardHeight = 0;
 let maxPages = 0;
-let perPage = 100;
+let perPage = 15;
 loader.style.display = 'none';
 
 const onSearchFormSubmit = async event => {
@@ -37,8 +37,7 @@ const onSearchFormSubmit = async event => {
     const isWhiteSpaceString = str => !str.replace(/\s/g, '').length;
     if (isWhiteSpaceString(searchedValue)) {
       iziToast.error({
-        message:
-          'Sorry, there are no images matching your search query. Please try again!',
+        message: 'Please fill out the form!',
         position: 'bottomRight',
       });
       loader.style.display = 'none';
