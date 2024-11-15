@@ -46,7 +46,7 @@ const onSearchFormSubmit = async event => {
     }
 
     loader.style.display = 'none';
-    maxPages = response.data.totalHits / perPage;
+    maxPages = Math.floor(response.data.totalHits / perPage);
     if (response.data.hits.length === 0) {
       loadMoreBtnEl.classList.add('is-hidden');
       iziToast.error({
