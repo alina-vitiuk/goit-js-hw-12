@@ -28,6 +28,8 @@ const onSearchFormSubmit = async event => {
     event.preventDefault();
     currentPage = 1;
 
+    lastText.style.display = 'none';
+
     searchedValue = searchFormEl.elements.user_query.value;
 
     loader.style.display = 'block';
@@ -43,11 +45,18 @@ const onSearchFormSubmit = async event => {
       loader.style.display = 'none';
       return;
     }
-
+    if (response.data.totalHits <= perPage) {
+      loadMoreBtnEl.style.visibility = 'hidden';
+      lastText.style.display = 'block';
+    } else {
+      loadMoreBtnEl.style.visibility = 'visible';
+    }
     loader.style.display = 'none';
     maxPages = Math.floor(response.data.totalHits / perPage);
+
+    console.log(maxPages);
     if (response.data.hits.length === 0) {
-      loadMoreBtnEl.classList.add('is-hidden');
+      loadMoreBtnEl.style.visibility = 'hidden';
       iziToast.error({
         message:
           'Sorry, there are no images matching your search query. Please try again!',
@@ -71,8 +80,6 @@ const onSearchFormSubmit = async event => {
     const galleryCardEl = galleryEl.querySelector('li');
 
     cardHeight = galleryCardEl.getBoundingClientRect().height;
-
-    loadMoreBtnEl.classList.remove('is-hidden');
   } catch (error) {
     loader.style.display = 'none';
     console.log(err);
@@ -84,27 +91,30 @@ const onLoadMoreBtnClick = async event => {
   onLoadMoreBtnClick.cantClick = true;
   try {
     currentPage++;
-    console.log(currentPage);
-    console.log(maxPages);
+    const response = await fetchPhotos(searchedValue, currentPage, perPage);
+    let galleryCardsTemplate = response.data.hits
+      .map(imgDetails => createGalleryCardTemplate(imgDetails))
+      .join('');
+
+    galleryEl.insertAdjacentHTML('beforeend', galleryCardsTemplate);
+    const refreshPage = new SimpleLightbox('.gallery a', {
+      captions: true,
+      captionsData: 'alt',
+      captionDelay: 250,
+    });
+    refreshPage.refresh();
     if (currentPage === maxPages) {
-      loadMoreBtnEl.classList.add('is-hidden');
+      loadMoreBtnEl.style.visibility = 'hidden';
       lastText.style.display = 'block';
-    } else {
-      const response = await fetchPhotos(searchedValue, currentPage, perPage);
-      let galleryCardsTemplate = response.data.hits
-        .map(imgDetails => createGalleryCardTemplate(imgDetails))
-        .join('');
-
-      galleryEl.insertAdjacentHTML('beforeend', galleryCardsTemplate);
-
-      scrollBy({
-        top: cardHeight * 2,
-        behavior: 'smooth',
-      });
-      setTimeout(() => {
-        onLoadMoreBtnClick.cantClick = false;
-      }, 200);
+      onLoadMoreBtnClick.cantClick = false;
     }
+    scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
+    setTimeout(() => {
+      onLoadMoreBtnClick.cantClick = false;
+    }, 200);
   } catch (err) {
     iziToast.error({
       message:
