@@ -54,9 +54,9 @@ const onSearchFormSubmit = async event => {
     loader.style.display = 'none';
     maxPages = Math.floor(response.data.totalHits / perPage);
 
-    console.log(maxPages);
     if (response.data.hits.length === 0) {
       loadMoreBtnEl.style.visibility = 'hidden';
+      lastText.style.display = 'none';
       iziToast.error({
         message:
           'Sorry, there are no images matching your search query. Please try again!',
@@ -82,7 +82,6 @@ const onSearchFormSubmit = async event => {
     cardHeight = galleryCardEl.getBoundingClientRect().height;
   } catch (error) {
     loader.style.display = 'none';
-    console.log(err);
   }
 };
 
